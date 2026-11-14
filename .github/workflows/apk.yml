@@ -34,7 +34,7 @@ jobs:
           cp index.html icon-512.png "$APP/www/"
           cd "$APP"
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/filesystem@6 @capacitor/share@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/filesystem@6 @capacitor/share@6 @capacitor-community/text-to-speech@5
           npx cap telemetry off || true
           npx cap init "Vista" com.vista.visionapp --web-dir www
           npx cap add android
@@ -43,6 +43,13 @@ jobs:
           c=json.load(open('capacitor.config.json'));c['backgroundColor']='#04131a';json.dump(c,open('capacitor.config.json','w'),indent=2)
           PY
           npx cap sync android
+          python3 - <<'PY'
+          p='android/app/src/main/AndroidManifest.xml'
+          m=open(p).read()
+          if 'TTS_SERVICE' not in m:
+              m=m.replace('<application','<queries><intent><action android:name="android.intent.action.TTS_SERVICE"/></intent></queries>\n    <application',1)
+              open(p,'w').write(m)
+          PY
           echo "APP=$APP" >> "$GITHUB_ENV"
 
       - name: Set the app icon
