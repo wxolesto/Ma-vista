@@ -660,10 +660,13 @@ $('#scrim').addEventListener('click',()=>closeSheet());
 function applyTheme(fade){const h=document.documentElement;h.dataset.theme=S.opts.theme;try{const m=$('meta[name=theme-color]');if(m)m.content=getComputedStyle(h).getPropertyValue('--bg').trim()}catch(e){}}
 /* speech */
 let tok=0;
-function stopSpeak(){tok++;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}}
+const NT=()=>{try{return window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.TextToSpeech}catch(e){return null}};
+let ttsWarn=0;
+function stopSpeak(){tok++;try{const T=NT();if(T)T.stop().catch(()=>{});else window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}}
 function say(text,o){
   o=o||{};
   return new Promise(res=>{
+    const T=NT();if(T){T.speak({text:text,lang:'en-US',rate:S.opts.rate*(o.r||1),pitch:o.pitch||1,volume:1,category:'playback'}).then(()=>res()).catch(()=>{if(!ttsWarn){ttsWarn=1;toast('صدای گوشی کار نکرد؛ موتور TTS را چک کن')}res()});return}
     if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined'){toast('صدای گوشی در دسترس نیست');res();return}
     try{const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=S.opts.rate*(o.r||1);u.pitch=o.pitch||1;u.onend=()=>res();u.onerror=()=>res();speechSynthesis.speak(u)}catch(e){res()}
   });
