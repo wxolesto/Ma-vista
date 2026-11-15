@@ -653,9 +653,38 @@ const V3APPENDIX=[
 CONTENT.v3l1.appendix=V3APPENDIX;
 CONTENT.v3l2.appendix=V3APPENDIX;
 CONTENT.v3l3.appendix=V3APPENDIX;
+CONTENT.v3l1.conversation=[
+ ["Sara","Why do people still remember Dr. Gharib?","چرا مردم هنوز دکتر قریب را به یاد می‌آورند؟"],
+ ["Nurse","Because he devoted his work to helping children and treated them with great care.","چون کارش را وقف کمک به کودکان کرده بود و با دقت و مهربانی از آن‌ها مراقبت می‌کرد."],
+ ["Sara","So his life is an example of service and responsibility.","پس زندگی او نمونه‌ای از خدمت و مسئولیت‌پذیری است."],
+ ["Nurse","Yes. Remembering such people reminds us to value kindness and dedication.","بله. به یاد داشتن چنین افرادی به ما یادآوری می‌کند که مهربانی و تعهد را ارزشمند بدانیم."]
+];
+CONTENT.v3l2.conversation=[
+ ["Student","I cannot find this word in my dictionary. What should I check first?","این واژه را در فرهنگ لغت پیدا نمی‌کنم. اول چه چیزی را بررسی کنم؟"],
+ ["Teacher","Check its spelling and look for the guide words at the top of the page.","املای آن را بررسی کن و کلمات راهنمای بالای صفحه را ببین."],
+ ["Student","The entry also gives a phonetic form and a short label.","مدخل، شکل آوانگاری و یک برچسب کوتاه هم دارد."],
+ ["Teacher","The phonetic form helps with pronunciation, and the label tells you the part of speech.","آوانگاری به تلفظ کمک می‌کند و برچسب، نقش دستوری واژه را نشان می‌دهد."]
+];
+CONTENT.v3l3.conversation=[
+ ["Neda","Why are renewable energy sources important?","چرا منابع انرژی تجدیدپذیر اهمیت دارند؟"],
+ ["Arman","They can be replenished naturally and help reduce dependence on limited fossil fuels.","آن‌ها به‌طور طبیعی جایگزین می‌شوند و می‌توانند وابستگی به سوخت‌های فسیلی محدود را کاهش دهند."],
+ ["Neda","Can sunlight and wind be used to produce electricity?","آیا می‌توان از نور خورشید و باد برای تولید برق استفاده کرد؟"],
+ ["Arman","Yes. Solar cells convert sunlight into electricity, while wind turbines use moving air to turn a generator.","بله. سلول‌های خورشیدی نور خورشید را به برق تبدیل می‌کنند و توربین‌های بادی از حرکت هوا برای چرخاندن مولد استفاده می‌کنند."]
+];
+CONTENT.v3l3.proverbs=[
+ ["Actions speak louder than words.","عمل از حرف گویاتر است؛ رفتار واقعی از وعده مهم‌تر است."],
+ ["Where there is a will, there is a way.","خواستن، راهی برای رسیدن پیدا می‌کند؛ اراده به یافتن راه کمک می‌کند."],
+ ["A friend in need is a friend indeed.","دوست واقعی در زمان نیاز شناخته می‌شود."],
+ ["Better late than never.","دیر انجام دادن بهتر از هرگز انجام ندادن است."],
+ ["Practice makes perfect.","تمرین مداوم مهارت را بهتر می‌کند."],
+ ["Two heads are better than one.","هم‌فکری دو نفر معمولاً از فکر یک نفر نتیجهٔ بهتری می‌دهد."],
+ ["Out of sight, out of mind.","چیزی که از دید دور باشد ممکن است از یاد هم برود."],
+ ["Easy come, easy go.","چیزی که آسان به دست آید ممکن است آسان هم از دست برود."]
+];
 
 
-const SECS=[['words','کلمات','Words','words'],['grammar','گرامر','Grammar','grammar'],['reading','ریدینگ','Reading','reading'],['further','مطالعه‌ی بیشتر','Further Reading','further'],['listening','لیسنینگ','Listening','listen'],['exam','نمونه سوال','Final-style Exam','exam'],['appendix','ضمیمه','Appendix','appendix']];
+
+const SECS=[['words','کلمات','Words','words'],['grammar','گرامر','Grammar','grammar'],['reading','ریدینگ','Reading','reading'],['further','مطالعه‌ی بیشتر','Further Reading','further'],['listening','مکالمه و شنیداری','Conversation & Listening','listen'],['exam','نمونه سوال','Final-style Exam','exam'],['appendix','ضمیمه','Appendix','appendix']];
 const QMAP={};
 Object.keys(CONTENT).forEach(l=>{const c=CONTENT[l];[...(c.grammar?c.grammar.qs:[]),...(c.reading?c.reading.qs:[]),...(c.further?c.further.qs:[]),...(c.listening?c.listening.qs:[]),...c.exam].forEach(q=>QMAP[q.id]=q)});
 KONKUR.forEach(q=>QMAP[q.id]=q);
@@ -677,7 +706,7 @@ try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&typeof j==='obje
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const bookOf=id=>DATA.books.find(b=>b.id===id),lessonOf=id=>{for(const b of DATA.books){const l=b.lessons.find(x=>x.id===id);if(l)return [b,l]}return null};
 const secDone=(l,s)=>!!S.done[l+':'+s];
-const lessonProg=l=>SECS.filter(s=>secDone(l,s[0])).length/SECS.length;
+const lessonProg=l=>{const list=SECS.filter(s=>s[0]!=='appendix'||!!CONTENT[l].appendix);return list.filter(s=>secDone(l,s[0])).length/list.length};
 const bookProg=b=>b.lessons.reduce((a,l)=>a+lessonProg(l.id),0)/b.lessons.length;
 
 /* ================= icons ================= */
@@ -801,7 +830,7 @@ function wrows(st){
   return L.map((x,i)=>({x,i})).filter(o=>!f||(o.x.w+' '+o.x.fa).toLowerCase().indexOf(f)>=0).map(o=>'<div class="wr" style="display:flex;align-items:center;gap:8px;padding:9px 4px;border-top:1px solid var(--line)"><button data-say="'+esc(o.x.w)+'" class="en" style="flex:0 0 42%;text-align:left;font-size:15px;font-weight:600;direction:ltr;color:var(--fg)">'+esc(o.x.w)+'</button><span style="flex:1;font-size:13.5px;color:var(--muted)">'+esc(o.x.fa)+'</span>'+(st.wt===1?'':'<button data-wk="'+o.i+'" aria-label="known" style="width:28px;height:28px;border-radius:99px;display:grid;place-items:center;flex:none;border:1px solid var(--stroke);'+(S.known[o.x.w]?'background:var(--accent);color:var(--accent-ink)':'color:transparent')+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round">'+IC.check+'</svg></button>')+'</div>').join('')||'<div class="muted" style="padding:14px;text-align:center">چیزی پیدا نشد</div>';
 }
 function wlQs(l){
-  const wl=CONTENT[l].wl.filter(x=>x.fa.split(/[،-]/)[0].trim().length<=24),sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]),pick=sh(wl).slice(0,10);
+  const wl=CONTENT[l].wl.filter(x=>x.fa.split(/[،-]/)[0].trim().length<=24),sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]),pick=sh(wl).slice(0,100);
   return pick.map((w,k)=>{const fa=w.fa.split(/[،-]/)[0].trim(),d=sh(wl.filter(x=>x!==w)).slice(0,3).map(x=>x.fa.split(/[،-]/)[0].trim()),pos=Math.floor(Math.random()*4),o=d.slice();o.splice(pos,0,fa);const q={id:'wl:'+l+':'+k,q:'What does “'+w.w+'” mean?',o,a:pos,e:w.w+' = '+w.fa};QMAP[q.id]=q;return q});
 }
 function drawStudy(keep){
@@ -810,7 +839,7 @@ function drawStudy(keep){
   let title='',body='',ft='';
   if(st.sec==='words'&&c.wl){
     title='Words';const wt=st.wt||0,tabs='<div class="sl" style="margin-bottom:6px"><button class="chip'+(wt===0?' on':'')+'" data-wt="0">لغت‌ها</button><button class="chip'+(wt===1?' on':'')+'" data-wt="1">هم‌آیی‌ها</button><button class="chip'+(wt===2?' on':'')+'" data-wt="2">تمرین</button></div>';
-    if(wt===2){if(!st.wqs)st.wqs=wlQs(st.l);body=tabs+'<div class="glass card"><h3>تمرین لغت</h3><div class="muted" style="font-size:14px">ده سوال تصادفی از لغت‌های درس</div></div>'+qList(st.wqs)+'<div style="text-align:center;margin:10px"><button class="chip" data-a="wnew">سوال‌های جدید</button></div>';ft=foot(st.wqs)}
+    if(wt===2){if(!st.wqs)st.wqs=wlQs(st.l);body=tabs+'<div class="glass card"><h3>تمرین لغت</h3><div class="muted" style="font-size:14px">تا ۱۰۰ سؤال تصادفی از واژگان درس</div></div>'+qList(st.wqs)+'<div style="text-align:center;margin:10px"><button class="chip" data-a="wnew">سوال‌های جدید</button></div>';ft=foot(st.wqs)}
     else{body=tabs+'<div class="glass card" style="padding:8px 10px"><input id="wq" class="srch" placeholder="جستجو…" value="'+esc(st.wf||'')+'" style="width:100%;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--glass);color:var(--fg);padding-inline:12px;font:inherit;outline:none;margin-bottom:6px"><div id="wlist">'+wrows(st)+'</div></div>';ft='<div class="sf"><button class="pill" data-a="finish">'+svg('check')+'تموم شد</button></div>'}
   }else if(st.sec==='words'){
     title='Words';const n=c.words.length,i=st.i||0;
@@ -839,12 +868,15 @@ function drawStudy(keep){
     const r=st.sec==='reading'?c.reading:c.further;title=st.sec==='reading'?'Reading':'Further Reading';
     body='<div class="glass card"><div class="row"><h3 class="en" style="flex:1">'+esc(r.title)+'</h3><button class="rbtn'+(st.tr?' on':'')+'" data-a="tr" aria-label="translate">'+svg('tr')+'</button><button class="rbtn" data-a="playall" aria-label="play">'+svg('play')+'</button></div></div>'
      +'<div class="glass card" style="padding:10px">'+r.s.map((x,i)=>'<div class="sent" data-sent="'+i+'" data-say="'+esc(x[0])+'"><div class="e">'+esc(x[0])+'</div>'+(st.tr?'<div class="f soft">'+esc(x[1])+'</div>':'')+'</div>').join('')+'</div>'
+     +(st.sec==='further'&&c.proverbs?'<div class="sec">Proverbs — ضرب‌المثل‌ها</div>'+c.proverbs.map(x=>'<div class="glass card"><div class="en" style="font-weight:650;direction:ltr;text-align:left">'+esc(x[0])+'</div><div class="muted" style="font-size:14px;margin-top:5px">'+esc(x[1])+'</div></div>').join(''):'')
      +'<div class="sec">سوال‌ها</div>'+qList(r.qs);ft=foot(r.qs);
   }else if(st.sec==='listening'){
-    const L=c.listening;title='Listening';
-    body='<div class="glass card" style="text-align:center"><h3 class="en">'+esc(L.title)+'</h3><div class="sub" style="margin:4px 0 14px">صدا با سینتی‌سایزر گوشی پخش می‌شه</div><button class="play" data-a="playlis" aria-label="play">'+svg(st.playing?'stop':'play')+'</button><div class="sl" style="margin-top:16px">'+[.8,1,1.2].map(r=>'<button class="chip'+(S.opts.rate===r?' on':'')+'" data-rate2="'+r+'">'+num(r+'x')+'</button>').join('')+'</div><div style="margin-top:12px"><button class="chip'+(st.script?' on':'')+'" data-a="script">نمایش متن</button></div></div>'
+    const L=c.listening;title='Conversation & Listening';
+    const conv=c.conversation||[];
+    const convHtml=conv.length?'<div class="sec">Conversation — مکالمه</div><div class="glass card" style="padding:10px">'+conv.map((x,i)=>'<div class="sent soft"><div class="e"><b>'+esc(x[0])+':</b> '+esc(x[1])+'</div><div class="f soft">'+esc(x[2])+'</div></div>').join('')+'</div>':'';
+    body=convHtml+'<div class="glass card" style="text-align:center"><h3 class="en">'+esc(L.title)+'</h3><div class="sub" style="margin:4px 0 14px">صدا با سینتی‌سایزر گوشی پخش می‌شه</div><button class="play" data-a="playlis" aria-label="play">'+svg(st.playing?'stop':'play')+'</button><div class="sl" style="margin-top:16px">'+[.8,1,1.2].map(r=>'<button class="chip'+(S.opts.rate===r?' on':'')+'" data-rate2="'+r+'">'+num(r+'x')+'</button>').join('')+'</div><div style="margin-top:12px"><button class="chip'+(st.script?' on':'')+'" data-a="script">نمایش متن</button></div></div>'
      +(st.script?'<div class="glass card" style="padding:10px">'+L.d.map((x,i)=>'<div class="sent soft" data-sent="'+i+'" data-say="'+esc(x[1])+'"><div class="e"><b>'+esc(x[0])+':</b> '+esc(x[1])+'</div></div>').join('')+'</div>':'')
-     +'<div class="sec">سوال‌ها</div>'+qList(L.qs);ft=foot(L.qs);
+     +'<div class="sec">سوال‌های شنیداری</div>'+qList(L.qs);ft=foot(L.qs);
   }
   el.innerHTML='<div class="sh"><button class="rbtn" data-a="closestudy" aria-label="close">'+svg('x')+'</button><h2 class="en">'+title+'</h2><span style="width:46px"></span></div><div class="sb">'+body+'</div>'+ft;
   const nb=$('.sb',el);if(nb)nb.scrollTop=top;
