@@ -838,7 +838,7 @@ try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&typeof j==='obje
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const bookOf=id=>DATA.books.find(b=>b.id===id),lessonOf=id=>{for(const b of DATA.books){const l=b.lessons.find(x=>x.id===id);if(l)return [b,l]}return null};
 const secDone=(l,s)=>!!S.done[l+':'+s];
-const lessonProg=l=>{const list=SECS.filter(s=>s[0]!=='appendix'||!!CONTENT[l].appendix);return list.filter(s=>secDone(l,s[0])).length/list.length};
+const lessonProg=l=>{const content=CONTENT[l];const list=SECS.filter(s=>s[0]!=='appendix'||!!(content&&content.appendix));return list.filter(s=>secDone(l,s[0])).length/list.length};
 const bookProg=b=>b.lessons.reduce((a,l)=>a+lessonProg(l.id),0)/b.lessons.length;
 
 /* ================= icons ================= */
